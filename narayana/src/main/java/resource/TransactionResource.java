@@ -13,11 +13,13 @@ public class TransactionResource {
     TransactionalService service;
 
     @GET
-    public String execute(@QueryParam("isFailed") boolean isFailed) {
-        String status = null;
+    public String execute(
+            @QueryParam("itemCode") String itemCode,
+            @QueryParam("quantity") int quantity,
+            @QueryParam("shouldFail") boolean shouldFail) {
         try {
-            status = service.performBusinessLogic(isFailed);
-            return status;
+            service.processOrder(itemCode, quantity, shouldFail);
+            return "Transazione completata con successo per " + itemCode;
         } catch (Exception exception) {
             return "Transazione fallita e rollback eseguito: " + exception.getMessage();
         }
