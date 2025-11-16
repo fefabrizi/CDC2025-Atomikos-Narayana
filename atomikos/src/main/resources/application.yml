@@ -7,14 +7,14 @@ spring:
       unique-resource-name: inventory-db
       xa-data-source-class-name: org.h2.jdbcx.JdbcDataSource
       xa-properties:
-        URL: jdbc:h2:file:./data/inventorydb;DB_CLOSE_DELAY=-1
+        URL: jdbc:h2:file:./atomikos/data/inventorydb;DB_CLOSE_DELAY=-1
         user: sa
         password:
     orders:
       unique-resource-name: orders-db
       xa-data-source-class-name: org.h2.jdbcx.JdbcDataSource
       xa-properties:
-        URL: jdbc:h2:file:./data/ordersdb;DB_CLOSE_DELAY=-1
+        URL: jdbc:h2:file:./atomikos/data/ordersdb;DB_CLOSE_DELAY=-1
         user: sa
         password:
   jpa:
