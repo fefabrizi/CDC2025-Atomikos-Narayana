@@ -33,10 +33,10 @@ public class InventoryDbConfig {
         factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Properties jpa = new Properties();
-        jpa.put("hibernate.hbm2ddl.auto", "update");
+        jpa.put("hibernate.hbm2ddl.auto", "validate");
         jpa.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        jpa.put("hibernate.transaction.jta.platform", "org.hibernate.engine.transaction.jta.platform.internal.AtomikosJtaPlatform");
-
+        jpa.put("hibernate.transaction.jta.platform",
+                "org.hibernate.engine.transaction.jta.platform.internal.AtomikosJtaPlatform");
         factory.setJpaProperties(jpa);
         return factory;
     }

@@ -18,39 +18,31 @@ public class OrderService {
         this.orderRepo = orderRepo;
     }
 
-    // Atomikos gestirà QUESTA transazione come distribuita (2PC)
     @Transactional
-    public void processOrder(String itemCode, int requestedQuantity, boolean shouldFail) {
-
-        System.out.println("\n--- INIZIO TRANSAZIONE DISTRIBUITA ---");
-
-        // 1. Logica del Database B (Orders) - Crea l'ordine
-        Order newOrder = new Order(itemCode, requestedQuantity);
-        orderRepo.save(newOrder);
-        System.out.println("1. Successo: Ordine ID " + newOrder.getId() + " creato nel DB Orders.");
-
-        // 2. Logica del Database A (Inventory) - Controlla e aggiorna lo stock
+    public Order placeOrder(String itemCode, int requestedQuantity) {
+        // 1. Check inventory availability
         InventoryItem item = inventoryRepo.findByItemCode(itemCode);
 
         if (item == null) {
-            throw new RuntimeException("ERRORE: Articolo non trovato in magazzino: " + itemCode);
+            throw new RuntimeException("Item not found: " + itemCode);
         }
 
         if (item.getQuantity() < requestedQuantity) {
-            // Questo forzerà un ROLLBACK su ENTRAMBI i DB
-            throw new RuntimeException("ERRORE: Stock insufficiente. Richiesto: " + requestedQuantity + ", Disponibile: " + item.getQuantity());
+            throw new RuntimeException("Insufficient stock for " + itemCode +
+                    ". Available: " + item.getQuantity() + ", Requested: " + requestedQuantity);
         }
 
+        // 2. Decrease inventory (writes to inventory DB)
         item.setQuantity(item.getQuantity() - requestedQuantity);
         inventoryRepo.save(item);
-        System.out.println("2. Successo: Stock aggiornato per " + itemCode + ". Nuovo stock: " + item.getQuantity());
 
-        // 3. Punto di Fallimento Forzato (per il test)
-        if (shouldFail) {
-            System.out.println("3. Fallimento Forzato! Atomikos eseguirà il ROLLBACK.");
-            throw new RuntimeException("ROLLBACK FORZATO!");
-        }
+        // 3. Create order (writes to orders DB)
+        Order order = Order.builder()
+                .itemCode(itemCode)
+                .requestedQuantity(requestedQuantity)
+                .status("COMPLETED")
+                .build();
 
-        System.out.println("--- COMMIT: Entrambi i DB salvano le modifiche ---");
+        return orderRepo.save(order);
     }
 }

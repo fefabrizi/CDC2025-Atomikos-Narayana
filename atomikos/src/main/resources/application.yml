@@ -1,23 +1,31 @@
-# file: atomikos/src/main/resources/application.yml
 spring:
-  jta:
-    enabled: true
   datasource:
     inventory:
       unique-resource-name: inventory-db
       xa-data-source-class-name: org.h2.jdbcx.JdbcDataSource
       xa-properties:
-        URL: jdbc:h2:file:./atomikos/data/inventorydb;DB_CLOSE_DELAY=-1
+        URL: "jdbc:h2:mem:inventorydb;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM 'classpath:sql/init-inventory.sql'"
         user: sa
         password:
+      min-pool-size: 1
+      max-pool-size: 5
+      test-query: "SELECT 1"
     orders:
       unique-resource-name: orders-db
       xa-data-source-class-name: org.h2.jdbcx.JdbcDataSource
       xa-properties:
-        URL: jdbc:h2:file:./atomikos/data/ordersdb;DB_CLOSE_DELAY=-1
+        URL: "jdbc:h2:mem:ordersdb;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM 'classpath:sql/init-orders.sql'"
         user: sa
         password:
+      min-pool-size: 1
+      max-pool-size: 5
+      test-query: "SELECT 1"
   jpa:
     hibernate:
-      ddl-auto: update
-    # Remove the empty properties section since it's configured in the Java config classes
+      ddl-auto: none
+    properties:
+      hibernate.transaction.jta.platform: org.hibernate.engine.transaction.jta.platform.internal.AtomikosJtaPlatform
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
