@@ -1,10 +1,5 @@
-DROP TABLE IF EXISTS inventory_item;
-
-CREATE TABLE inventory_item (
-    item_code VARCHAR(255) PRIMARY KEY,
-    quantity INT NOT NULL
-);
-
+-- sql
+-- `narayana/src/main/resources/sql/init-inventory.sql`
 INSERT INTO inventory_item (item_code, quantity) VALUES
  ('ITEM_A', 100),
  ('ITEM_B', 50),

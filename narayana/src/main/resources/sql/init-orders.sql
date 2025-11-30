@@ -1,8 +1,5 @@
-DROP TABLE IF EXISTS customer_order;
-
-CREATE TABLE customer_order (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    item_code VARCHAR(255) NOT NULL,
-    requested_quantity INT NOT NULL,
-    status VARCHAR(50) DEFAULT 'CREATED'
-);
+-- sql
+-- `narayana/src/main/resources/sql/init-orders.sql`
+-- Leave empty or add sample data if needed, Hibernate creates `customer_order`
+-- Example:
+-- INSERT INTO customer_order (item_code, requested_quantity, status) VALUES ('ITEM_A', 1, 'CREATED');
