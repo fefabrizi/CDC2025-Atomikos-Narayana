@@ -3,8 +3,9 @@ package repository.inv;
 import entity.inv.InventoryItem;
 import io.quarkus.hibernate.orm.PersistenceUnit;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 
 @ApplicationScoped
 public class InventoryRepository {
@@ -18,8 +19,12 @@ public class InventoryRepository {
     }
 
     public InventoryItem findByItemCode(String itemCode) {
-        return em.createQuery("SELECT i FROM InventoryItem i WHERE i.itemCode = :code", InventoryItem.class)
-                .setParameter("code", itemCode)
-                .getSingleResult();
+        try {
+            return em.createQuery("SELECT i FROM InventoryItem i WHERE i.itemCode = :code", InventoryItem.class)
+                    .setParameter("code", itemCode)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }
