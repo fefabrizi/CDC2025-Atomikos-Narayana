@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import java.util.List;
 
 @ApplicationScoped
 public class InventoryRepository {
@@ -13,6 +14,11 @@ public class InventoryRepository {
     @Inject
     @PersistenceUnit("inventory")
     EntityManager em;
+
+    public List<InventoryItem> findAll() {
+        return em.createQuery("SELECT i FROM InventoryItem i", InventoryItem.class)
+                .getResultList();
+    }
 
     public void persist(InventoryItem item) {
         em.persist(item);

@@ -2,16 +2,20 @@
 package resource;
 
 import dto.OrderRequest;
+import entity.inv.InventoryItem;
 import entity.ord.Order;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import service.OrderService;
+import repository.inv.InventoryRepository;
+import java.util.List;
+import java.util.Random;
 
 @Path("/api/orders")
 @Produces(MediaType.APPLICATION_JSON)
@@ -23,12 +27,24 @@ public class OrderResource {
     @Inject
     OrderService orderService;
 
-    @POST
+    @Inject
+    InventoryRepository inventoryRepository;
+
+    @GET
     @Path("/place")
-    public Response place(OrderRequest req) {
-        LOG.infof("Received order request: itemCode=%s, requestedQuantity=%d", req.itemCode, req.requestedQuantity);
+    public Response placeRandom() {
         try {
-            Order order = orderService.placeOrder(req.itemCode, req.requestedQuantity);
+            // Assume you have an injected InventoryService
+            List<InventoryItem> items = inventoryRepository.findAll();
+            if (items.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(java.util.Map.of("error", "No items in inventory"))
+                        .build();
+            }
+            InventoryItem randomItem = items.get(new java.util.Random().nextInt(items.size()));
+            int randomQuantity = 1 + new java.util.Random().nextInt(5);
+
+            Order order = orderService.placeOrder(randomItem.getItemCode(), randomQuantity);
             LOG.infof("Order placed successfully: id=%s, itemCode=%s, requestedQuantity=%d, status=%s",
                     order.id, order.itemCode, order.requestedQuantity, order.status);
             return Response.ok(order).build();
@@ -39,4 +55,5 @@ public class OrderResource {
                     .build();
         }
     }
+
 }
